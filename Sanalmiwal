@@ -1,0 +1,88 @@
+//PROYECTO DE MONITOREO AGRARIO CON RIEGO AUTOMATICO -ALUMNOS UPAO-SAN ALMIWAL
+////////////////////////////////////////////////////////////////////
+
+  #include <DHT.h>//Incluyo la librería del sensor DHT11
+
+//////////////////////////pINES Y ALGUNAS VARIABLES////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+int sensor = 2;//Pin 2 
+int temp, humedad;//DHT11
+const int aguanivel = 9; //Pin 9 el aguaaguaaguanivel de agua
+const int bombariego = 13; //Pin 13 para la bomba-riego-riego
+int Suelohumedo =A0; //A0 PIN POR DONDE se medira la humedad del suelo
+float lectura =A0;
+
+DHT dht (sensor, DHT11);//Configuro el modelo de DHT
+int botonest = 0; //Inicializamos a 0 el estado del boton
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////Parte de humedad suelo y riego//////////
+//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+void setup()
+{
+  Serial.begin(9600);//puerto serie 9600
+  dht.begin();//inicia el sensor de temperatura y humedad
+
+////// //ENTRADAS Y SALIDAS/////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+ 
+  pinMode(Suelohumedo, INPUT);// Suelohumedo como entrada
+  pinMode(bombariego, OUTPUT);//  como salida
+  pinMode(aguanivel, INPUT);// aguaaguaaguanivel de agua como entrada
+
+ 
+
+
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+void loop()
+{
+  lectura = analogRead(A0);//Leo el valor de la humedad 
+  Suelohumedo = map(lectura,0,1023,100,0);
+  int Sensoraguanivel = digitalRead(aguanivel); //Leo  el aguaaguaaguanivel de agua
+ 
+
+  ///////////LOS VALORES ARROJADOS DE TEMPERTATURA Y HUMEDAD INGRESADOS A NUEVAS VARIABLES//////////////////////
+  humedad = dht.readHumidity();
+  temp = dht.readTemperature();
+
+  /////Puerto serie
+  //Imprimo por el puerto serie los valores de temperatura y humedad del DHT11
+  Serial.print(humedad);Serial.print(","); Serial.print(Suelohumedo); ;Serial.print(",");Serial.print(temp);Serial.print("\n");
+
+  //Se imprime en el puerto serie el valor del suelo humedo
+  
+  delay(800);
+
+
+  if (Sensoraguanivel == 1)
+  {
+    
+
+    if (Suelohumedo > 60) // el valor que considero seco y hay que regar es de 700
+    {
+      // Si la tierra está seca, comenzara a regar
+      // Riega durante 2 segundoS y espera a comprobar la humedad otro segundo
+       digitalWrite(bombariego, HIGH);
+       
+    }
+
+    if (Suelohumedo <=60) //No es necesario el riego automático, pero se puede regar de forma manual
+    {
+      
+        digitalWrite(bombariego, LOW);
+      delay(2000);
+      
+      
+    }
+  }
+}
